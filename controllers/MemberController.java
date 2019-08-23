@@ -2,29 +2,30 @@ package com.bitcamp.controllers;
 import javax.swing.JOptionPane;
 import com.bitcamp.services.MemberService;
 import com.bitcamp.domains.MemberBean;
-
-
 public class MemberController {
-	
-	public static void main(String []args) {
+
+	public static void main(String[] args) {
 		MemberService service = new MemberService();
 		MemberBean member = null;
-				
+		String msg = "";
+		String[] arr = null;
+		String temp = "";
 		while(true) {
-			switch (JOptionPane.showInputDialog("0. 종료\n"
-					+ "1. 회원가입\n"
-					+ "2. 마이페이지\n"
-					+ "3. 비밀번호 수정\n"
-					+ "4. 회원탈퇴\n"
-					+ "5. 회원목록\n"
-					+ "6. 아이디검색")) {
+			switch (JOptionPane.showInputDialog("0.종료 \n"
+					+ "1.회원가입\n"
+					+ "2.마이페이지\n"
+					+ "3.비번 수정\n"
+					+ "4.회원탈퇴\n"
+					+ "5.아이디체크\n"
+					+ "6.로그인")) {
 			case "0":
 				JOptionPane.showMessageDialog(null, "종료");
+				
 				return;
 			case "1":
-				String spec = JOptionPane.showInputDialog("이름, 아이디, 비번, 주민번호, 혈액형, 키, 몸무게");
-				System.out.println("****" + spec);
-				String[] arr = spec.split(",");
+				temp = JOptionPane.showInputDialog("이름,아이디,비번,주민번호,혈액형,키,몸무게 ");
+				System.out.println("****" + temp);
+				arr = temp.split(",");
 				member = new MemberBean();
 				member.setName(arr[0]);
 				member.setID(arr[1]);
@@ -34,30 +35,50 @@ public class MemberController {
 				member.setTall(Double.parseDouble(arr[5]));
 				member.setWeight(Double.parseDouble(arr[6]));
 				
-				String msg = service.join(member);
-				JOptionPane.showMessageDialog(null, msg);
+				JOptionPane.showMessageDialog(null, service.join(member));
 				break;
 			case "2":
 				JOptionPane.showMessageDialog(null, service.getMyPage(member));
 				break;
 			case "3":
-				
+				String tempID = JOptionPane.showInputDialog("아이디");
+				String currPW = JOptionPane.showInputDialog("현재비번");
+				String newPw = JOptionPane.showInputDialog("변경할비번");
+				member = new MemberBean();
+				member.setID(tempID);
+				member.setPwd(currPW+","+newPw);
+				JOptionPane.showMessageDialog(null, service.changePassword(member));
 				break;
 			case "4":
+				String byeID = JOptionPane.showInputDialog("탈퇴하실 ID를 입력하세요.");
+				String byePwd = JOptionPane.showInputDialog("탈퇴하실 Pwd를 입력하세요.");
+				member = new MemberBean();
+				member.setID(byeID);
+				member.setPwd(byePwd);
+				JOptionPane.showMessageDialog(null, service.Withdrawal(member));
 				
+				JOptionPane.showMessageDialog(null,  member);
 				break;
 			case "5":
-				JOptionPane.showMessageDialog(null, service.list());
+				String searchId = JOptionPane.showInputDialog("검색 ID"); 
+				member = service.findByID(searchId);
+				JOptionPane.showMessageDialog(null, member);
 				break;
 			case "6":
-				String searchID = JOptionPane.showInputDialog("검색 ID");
-				member = service.findByID(searchID);
-				JOptionPane.showMessageDialog(null, member);
-				
+				String loginValue = JOptionPane.showInputDialog("로그인 ID, PW"); 
+				arr = loginValue.split(",");
+				String loginId = arr[0];
+				String loginPw = arr[1];
+				member = new MemberBean();
+				member.setPwd(loginPw);
+				msg = service.login(member);
+				JOptionPane.showMessageDialog(null, msg); 
 				break;
-			default:				
+			default:
 				break;
 			}
 		}
+
 	}
+
 }
